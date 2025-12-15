@@ -1,0 +1,75 @@
+version: '3.9'
+
+services:
+  redis:
+    image: docker.io/redis:latest
+    networks:
+      - evolution-net
+    container_name: redis
+    command: >
+      redis-server --port 6379 --appendonly yes
+    volumes:
+      - evolution_redis:/data
+    ports:
+      - 6379:6379
+
+  postgres:
+    image: docker.io/postgres:15
+    container_name: postgres
+    networks:
+      - evolution-net
+    restart: always
+    env_file:
+      - .env.postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  pgadmin:
+    image: docker.io/dpage/pgadmin4:latest
+    networks:
+      - evolution-net
+    env_file:
+      - .env.pg-admin
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - 4000:80
+
+  evolution-api:
+    container_name: evolution_api
+    image: docker.io/evoapicloud/evolution-api:v2.3.5
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.evolution-api
+    volumes:
+      - evolution_instances:/evolution/instances
+    networks:
+      - evolution-net
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    env_file:
+      - .env.n8n
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - evolution-net
+
+volumes:
+  evolution_instances:
+  evolution_redis:
+  postgres_data:
+  pgadmin_data:
+  n8n_data:
+
+networks:
+  evolution-net:
+    name: evolution-net
+    driver: bridge
