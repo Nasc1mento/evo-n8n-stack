@@ -14,7 +14,7 @@ services:
       - 6379:6379
 
   postgres:
-    image: docker.io/postgres:15
+    image: docker.io/pgvector/pgvector:pg15
     container_name: postgres
     networks:
       - evolution-net
@@ -59,8 +59,26 @@ services:
       - .env.n8n
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./documentos:/home/node/.n8n-files:Z,U
     networks:
       - evolution-net
+
+  ollama:
+    image: docker.io/ollama/ollama:rocm
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0
+    volumes:
+      - ollama:/root/.ollama
+    networks:
+      - evolution-net
+    entrypoint: /bin/sh -c "/bin/ollama serve & sleep 10 && ollama pull qwen2.5:7b && ollama pull nomic-embed-text && tail -f /dev/null"
 
 volumes:
   evolution_instances:
@@ -68,6 +86,7 @@ volumes:
   postgres_data:
   pgadmin_data:
   n8n_data:
+  ollama:
 
 networks:
   evolution-net:
