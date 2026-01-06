@@ -63,22 +63,6 @@ services:
     networks:
       - evolution-net
 
-  ollama:
-    image: docker.io/ollama/ollama:rocm
-    container_name: ollama
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    devices:
-      - /dev/kfd:/dev/kfd
-      - /dev/dri:/dev/dri
-    environment:
-      - HSA_OVERRIDE_GFX_VERSION=10.3.0
-    volumes:
-      - ollama:/root/.ollama
-    networks:
-      - evolution-net
-    entrypoint: /bin/sh -c "/bin/ollama serve & sleep 10 && ollama pull qwen2.5:7b && ollama pull nomic-embed-text && tail -f /dev/null"
 
 volumes:
   evolution_instances:
