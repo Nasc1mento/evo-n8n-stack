@@ -70,7 +70,6 @@ volumes:
   postgres_data:
   pgadmin_data:
   n8n_data:
-  ollama:
 
 networks:
   evolution-net:
