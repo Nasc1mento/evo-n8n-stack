@@ -59,7 +59,6 @@ services:
       - .env.n8n
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./documentos:/home/node/.n8n-files:Z,U
     networks:
       - evolution-net
 
